@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendColorBot", "SendColorBot\SendColorBot.csproj", "{DE7DD955-388D-4A87-99FC-37F90E3D11FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE7DD955-388D-4A87-99FC-37F90E3D11FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE7DD955-388D-4A87-99FC-37F90E3D11FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE7DD955-388D-4A87-99FC-37F90E3D11FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE7DD955-388D-4A87-99FC-37F90E3D11FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2CCFFC77-28F5-423E-B672-9BC81FB2C4D7}
+	EndGlobalSection
+EndGlobal
