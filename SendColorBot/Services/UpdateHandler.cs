@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Args;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace SendColorBot.Services
 {
@@ -21,29 +22,22 @@ namespace SendColorBot.Services
             
         }
 
-        private IPixel GetColor(string requestString)
+        private Rgba32 GetColor(string requestString)
         {
             if (requestString.ToCharArray()[0] == '#')
             {
-                byte[] rgb = FromHexToRgb("requestString");
-                return new Rgb24(rgb[0], rgb[1], rgb[2]);
+                return Rgba32.FromHex(requestString.Remove(0));
             }
 
-            return null;
+            return new Rgba32(0, 0, 0);
         }
 
-        private byte[] FromHexToRgb(string hex)
+        private IImage GenerateImage(Rgba32 color)
         {
-            IEnumerable<string> hexParts = new List<string>();
-            hexParts = hex.SplitInParts(2);
+            var image = new Image<Rgba32> (500, 500);
+            image.Mutate(ctx => ctx.Fill(color));
 
-            List<byte> result = new List<byte>();
-            foreach (var hexPart in hexParts)
-            {
-                result.Add(byte.Parse(hexPart, System.Globalization.NumberStyles.HexNumber));
-            }
-
-            return result.ToArray();
+            return image;
         }
     }
 }
