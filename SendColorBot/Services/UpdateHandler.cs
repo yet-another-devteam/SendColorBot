@@ -7,6 +7,7 @@ using Telegram.Bot.Args;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot.Services
 {
@@ -14,7 +15,7 @@ namespace SendColorBot.Services
     {
         public async Task OnMessage(MessageEventArgs m)
         {
-
+            
         }
 
         public async Task OnInlineQuery(InlineQueryEventArgs q)

@@ -1,5 +1,8 @@
 {
 	"tokens": {
-		"telegram":"TELEGRAMBOTTOKENHERE"
+		"telegram":"TELEGRAMBOTTOKENHERE",
+		"fileserver-path" : "./file-server/images",
+		"fileserver-ip" : "IP:PORTHERE"
 	}
+
 }
