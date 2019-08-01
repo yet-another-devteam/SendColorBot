@@ -3,12 +3,6 @@ using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot
 {
-    public enum ColorSpaces
-    {
-        RGB24,
-        RGB32
-    }
-    
     public class InlineCardProcessor
     {
         private ImageGenerator generator;
