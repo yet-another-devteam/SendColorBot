@@ -30,7 +30,7 @@ namespace SendColorBot.Services
                 return Rgba32.FromHex(requestString.Remove(0));
             }
 
-            return new Rgba32(0, 0, 0);
+            throw new Exception("Unknown color");
         }
     }
-}
+}    
