@@ -32,13 +32,5 @@ namespace SendColorBot.Services
 
             return new Rgba32(0, 0, 0);
         }
-
-        private IImage GenerateImage(Rgba32 color)
-        {
-            var image = new Image<Rgba32> (500, 500);
-            image.Mutate(ctx => ctx.Fill(color));
-
-            return image;
-        }
     }
 }
