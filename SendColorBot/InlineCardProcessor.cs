@@ -5,16 +5,16 @@ namespace SendColorBot
 {
     public class InlineCardProcessor
     {
-        private ImageGenerator generator;
+        private ImageGenerator imageGenerator;
         
         public InlineCardProcessor()
         {
-            generator = new ImageGenerator(Configuration.Root["tokens:fileserver-path"], Configuration.Root["tokens:fileserver-ip"]);    
+            imageGenerator = new ImageGenerator(Configuration.Root["tokens:fileserver-path"], Configuration.Root["tokens:fileserver-ip"]);    
         }
         
-        public InlineQueryResultPhoto ProccessInlineCard(byte id, Rgba32 color, ColorSpaces colorSpace)
+        public InlineQueryResultPhoto ProccessInlineCard(byte id, Rgba32 color, string colorSpaceName)
         {
-            string photoUrl = generator.Generate(color);
+            string photoUrl = imageGenerator.Generate(color);
             return new InlineQueryResultPhoto(id.ToString(), photoUrl, photoUrl);
         }
     }

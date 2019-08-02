@@ -1,18 +1,20 @@
+using System.Numerics;
 using SendColorBot.Interfaces;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace SendColorBot.ColorSpaces
 {
-    public class Cmyk : IColorSpace
+    public class Cmyk : ColorSpace
     {
-        public bool Verify(int[] colors)
+        public Cmyk() : base("CMYK", 4, new []{100, 100, 100, 100})
         {
-            if (colors.Length != 4)
-                return false;
             
-            return colors[0] >= 0 && colors[0] <= 100 && 
-               colors[1] >= 0 && colors[1] <= 100 && 
-               colors[2] >= 0 && colors[2] <= 100 &&
-               colors[2] >= 0 && colors[3] <= 100;
+        }
+
+        protected override Rgba32 ConvertToRgb32(int[] colors)
+        {
+            return new Rgba32(new Vector4(
+                colors[0], colors[1], colors[2], colors[3]));
         }
     }
 }
