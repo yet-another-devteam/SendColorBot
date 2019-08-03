@@ -16,7 +16,7 @@ namespace SendColorBot
         /// <param name="id">Card ID</param>
         /// <param name="color">With this color ImageGenerator will generate picture</param>
         /// <param name="colorSpaceName">Color space that used for this color</param>
-        public InlineQueryResultArticle ProcessInlineCard(byte id, Rgba32 color, string colorSpaceName)
+        public InlineQueryResultArticle ProcessInlineCard(int id, Rgba32 color, string colorSpaceName)
         {
             // Generates picture with color
             string photoUrl = imageGenerator.Generate(color);

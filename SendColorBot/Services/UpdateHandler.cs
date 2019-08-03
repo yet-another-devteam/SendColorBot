@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using SendColorBot.ColorSpaces;
-using SendColorBot.Interfaces;
 using Telegram.Bot.Args;
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot.Services
@@ -16,9 +12,13 @@ namespace SendColorBot.Services
     class UpdateHandler
     {
         private readonly List<ColorSpace> colorSpaces;
-
+        private readonly InlineCardProcessor cardProcessor;
+        
         public UpdateHandler()
         {
+            cardProcessor = new InlineCardProcessor();
+            
+            // List of available color spaces
             colorSpaces = new List<ColorSpace>()
             {
                 new Cmyk()
@@ -31,22 +31,40 @@ namespace SendColorBot.Services
 
         public async Task OnInlineQuery(InlineQueryEventArgs q)
         {
+            // Stores requested string from user
+            string request = q.InlineQuery.Query;
+
             List<InlineQueryResultBase> result = new List<InlineQueryResultBase>();
+
+            // An array that stores colors from the request
+            int[] colors = GetColors(request);
+            
             foreach (var colorSpace in colorSpaces)
             {
-                result.Add();
+                // If color space can have these colors
+                if (colorSpace.Verify(colors)) 
+                {
+                    result.Add(cardProcessor.ProcessInlineCard(
+                        result.Count + 1, colorSpace.ConvertToRgb32(colors), colorSpace.Name));
+                }
             }
-        }
 
-        private void GetColorSpace()
-        {
-            
+            await Bot.Client.AnswerInlineQueryAsync(q.InlineQuery.Id, result);
         }
-        private Rgba32 GetColor(string requestString)
+        
+        private int[] GetColors(string requestString)
         {
+            // If input in HEX, then translate to decimal array of colors 
             if (requestString.ToCharArray()[0] == '#')
             {
-                return Rgba32.FromHex(requestString.Remove(0));
+                byte[] result = {
+                    Rgba32.FromHex(requestString.Remove(0)).R,
+                    Rgba32.FromHex(requestString.Remove(0)).G,
+                    Rgba32.FromHex(requestString.Remove(0)).B
+                };
+                
+                // Translates byte array to int array and returns result
+                return result.Select(x => (int) x).ToArray();
             }
 
             throw new Exception("Unknown color");
