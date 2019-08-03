@@ -1,17 +1,18 @@
-using SendColorBot.Interfaces;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace SendColorBot.ColorSpaces
 {
-    public class Rgb : IColorSpace
+    public class Rgb : ColorSpace
     {
-        public bool Verify(int[] colors)
+        public Rgb() : base("RGB", 3, new []{255, 255, 255})
         {
-            if (colors.Length != 3)
-                return false;
-
-            return colors[0] >= 0 && colors[0] <= 255 &&
-                   colors[1] >= 0 && colors[1] <= 255 &&
-                   colors[2] >= 0 && colors[2] <= 255;
+            
         }
+        
+        public override Rgba32 ConvertToRgb32(int[] colors)
+        {
+            return new Rgba32(colors[0], colors[1], colors[2]);
+        }
+
     }
 }

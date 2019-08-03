@@ -16,7 +16,7 @@ namespace SendColorBot.ColorSpaces
             this.maxColors = maxColors;
         }
         
-        public virtual bool Verify(int[] colors)
+        public bool Verify(int[] colors)
                                 {
                                     if (colors.Length != colorsCount)
                                         return false;
@@ -25,6 +25,6 @@ namespace SendColorBot.ColorSpaces
             return !colors.Where((t, i) => !(t >= 0 && t <= maxColors[i])).Any();
         }
 
-        protected abstract Rgba32 ConvertToRgb32(int[] colors);
+        public abstract Rgba32 ConvertToRgb32(int[] colors);
     }
 }
