@@ -21,7 +21,8 @@ namespace SendColorBot.Services
             // List of available color spaces
             colorSpaces = new List<ColorSpace>()
             {
-                new Cmyk()
+                new Cmyk(),
+                new Rgb()
             };
         }
         public async Task OnMessage(MessageEventArgs m)
