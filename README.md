@@ -13,4 +13,4 @@ SendColorBot is a telegram bot that helps to send colors through the Inline inte
 
 [Telegram.Bot](https://github.com/TelegramBots/Telegram.Bot) — .NET Client for Telegram Bot API.
 
-[ImageSharp](https://github.com/SixLabors/ImageSharp) — A cross-platform library for the processing of image files.
+[ImageSharp](https://github.com/SixLabors/ImageSharp) — Cross-platform library for image file processing.
