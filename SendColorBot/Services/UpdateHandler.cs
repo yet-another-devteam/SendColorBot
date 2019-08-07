@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 using SendColorBot.ColorSpaces;
 using Telegram.Bot.Args;
 using SixLabors.ImageSharp.PixelFormats;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot.Services

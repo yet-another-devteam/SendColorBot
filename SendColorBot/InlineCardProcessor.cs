@@ -1,5 +1,4 @@
 using SixLabors.ImageSharp.PixelFormats;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot
