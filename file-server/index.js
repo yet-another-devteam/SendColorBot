@@ -7,5 +7,5 @@ app.use(ecstatic({
   root: `${__dirname}/images`,
   showdir: true,
 })); 
-http.createServer(app).listen();
-console.log('Listening on :8080');
+http.createServer(app).listen(443);
+console.log('Listening on :443');
