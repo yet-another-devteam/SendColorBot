@@ -29,11 +29,13 @@ Also, you need a file server with SSL support. It used to send generated images.
 3. Navigate to the directory that specified in the console:
    ```sh
    ...
-   SendColorBot -> /home/dubzer/SendColorBot/SendColorBot/bin/Release/netcoreapp2.2/publish/    // Here path is ./SendColorBot/bin/Release/netcoreapp2.2/publish
-
+   // Here is the path
+   SendColorBot -> /home/dubzer/SendColorBot/SendColorBot/bin/Release/netcoreapp2.2/publish/    
+   ...
+   
    cd ./SendColorBot/bin/Release/netcoreapp2.2/publish
 4. Create **configuration.json**, paste this text and insert your values:
-   ```sh
+   ```json
    {
     "tokens": {
      "telegramapi": "Bot token. Get it at @BotFather",
