@@ -18,7 +18,7 @@ SendColorBot is a telegram bot that helps to send colors through the Inline inte
 ## ▶️ Build
 You need .NET Core SDK 2.2+. [Download it here](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
-Also, you need a file server with SSL support. It used to send generated images. I use nginx for this, but you can try any other. For easy installation, you can use autoinstall script by @angristan [from here](https://github.cёom/angristan/nginx-autoinstall). In addition, you can use [config generator](https://nginxconfig.io/) by @0xB4LINT.
+Also, you need a file server with SSL support. It used to send generated images. I use nginx for this, but you can try any other. For easy installation, you can use autoinstall script by [@angristan](https://github.com/angristan) [from here](https://github.cёom/angristan/nginx-autoinstall). In addition, you can use [config generator](https://nginxconfig.io/) by [@0xB4LINT](https://github.com/0xB4LINT).
 
 1. Clone repository and open directory:
    ```sh
