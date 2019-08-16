@@ -8,12 +8,12 @@ namespace SendColorBot
     public class ImageGenerator
     {
         private string fileserverPath;
-        private string fileserverIp;
+        private string fileserverDomain;
         
-        public ImageGenerator(string fileserverPath, string fileserverIp)
+        public ImageGenerator(string fileserverPath, string fileserverDomain)
         {
             this.fileserverPath = fileserverPath;
-            this.fileserverIp = fileserverIp;
+            this.fileserverDomain = fileserverDomain;
         }
         /// <summary>
         /// Generates image with color and returns link
@@ -28,7 +28,7 @@ namespace SendColorBot
             image.Save($"{fileserverPath}/{filename}", 
                 new PngEncoder());
 
-            return $@"{fileserverIp}/{filename}";
+            return $@"{fileserverDomain}/{filename}";
         }
     }
 }
