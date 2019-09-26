@@ -30,6 +30,10 @@ namespace SendColorBot.Services
         {
             // Stores the string requested by the user
             string request = q.InlineQuery.Query;
+            
+            if (string.IsNullOrEmpty(request))
+                return;
+
             // An array that stores colors from the request
             int[] colors;
 
