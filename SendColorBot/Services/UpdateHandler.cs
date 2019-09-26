@@ -64,25 +64,38 @@ namespace SendColorBot.Services
         
         private int[] GetColors(string requestString)
         {
-            // If input in HEX, then translate to decimal array of colors 
-            if (requestString.ToCharArray()[0] == '#')
+            if (HexColorString(requestString))
             {
-                byte[] result = {
-                    Rgba32.FromHex(requestString.Remove(0)).R,
-                    Rgba32.FromHex(requestString.Remove(0)).G,
-                    Rgba32.FromHex(requestString.Remove(0)).B
-                };
-                // Translates byte array to int array and returns result
-                return result.Select(x => (int) x).ToArray();
+                return GetColorsFromHex(requestString);
             }
             
             // Selects all colors and creates an array of them
-            string[] colors = Regex.Matches(requestString, @"([0-9]){1,3}")
+            string[] colors = Regex.Matches(requestString, @"([0-9--]){1,}")
                 .Select(m => m.Value)
                 .ToArray();
             
             // Coverts string array to int array and returns
             return Array.ConvertAll(colors, int.Parse);
+        }
+
+        private bool HexColorString(string hexString)
+        {
+            Regex regex = new Regex(@"[0-9A-Fa-f]{1,8}");
+            var matches = regex.Matches(hexString);
+            
+            string match = matches.Count == 1 ? matches[0].Value : null;
+
+            return match != null && hexString.Length - match.Length <= 1;
+        }
+        
+        private int[] GetColorsFromHex(string hexString)
+        {
+            var rgba = Rgba32.FromHex(hexString);
+                
+            byte[] result = { rgba.R, rgba.G, rgba.B };
+            // Translates byte array to int array and returns result
+            return result.Select(x => (int) x).ToArray();
+
         }
     }
 }    
