@@ -1,34 +1,20 @@
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
+using System;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
 namespace SendColorBot
 {
-    public class ImageGenerator
+    public class ImageGenerator : IImageGenerator
     {
-        private string fileserverPath;
-        private string fileserverDomain;
+        private string _domain;
         
-        public ImageGenerator(string fileserverPath, string fileserverDomain)
+        public ImageGenerator(string imageGeneratorDomain)
         {
-            this.fileserverPath = fileserverPath;
-            this.fileserverDomain = fileserverDomain;
+            _domain = imageGeneratorDomain;
         }
-        /// <summary>
-        /// Generates image with color and returns link
-        /// </summary>
-        /// <returns>Link on image</returns>
-        public string Generate(Rgba32 color)
+        
+        public string GetLink(Rgba32 color)
         {
-            string filename = $@"{color.ToHex()}.png";
-            
-            var image = new Image<Rgba32> (500, 500);
-            image.Mutate(ctx => ctx.Fill(color));
-            image.Save($"{fileserverPath}/{filename}", 
-                new PngEncoder());
-
-            return $@"{fileserverDomain}/{filename}";
+            return $"{_domain}?width=250&height=250&color={Convert.ToDecimal(color.R)}{Convert.ToDecimal(color.G)}{Convert.ToDecimal(color.B)}{Convert.ToDecimal(color.A)}";
         }
     }
 }
