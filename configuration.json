@@ -1,7 +1,0 @@
-{
-	"tokens": {
-		"telegram":"TELEGRAM-BOT-TOKEN-HERE",
-		"fileserver-path" : "FILESERVER-FOLDER-HERE",
-    	"fileserver-domain": "DOMAIN-HERE"
-	}
-}
