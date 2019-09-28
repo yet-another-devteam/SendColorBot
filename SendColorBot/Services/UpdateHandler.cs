@@ -49,14 +49,11 @@ namespace SendColorBot.Services
 
             // Inline card list 
             List<InlineQueryResultBase> result = new List<InlineQueryResultBase>();
-            foreach (var colorSpace in colorSpaces)
+            
+            foreach (var colorSpace in colorSpaces.Where(colorSpace => colorSpace.Verify(colors)))
             {
-                // If color space can have these colors
-                if (colorSpace.Verify(colors))
-                {
-                    result.Add(cardProcessor.ProcessInlineCard(
-                        result.Count + 1, colorSpace.ConvertToRgb32(colors), colorSpace.Name));
-                }
+                result.AddRange(cardProcessor.ProcessInlineCardsForColorSpace(
+                    result.Count == 0 ? 0 : + 2, colorSpace.ConvertToRgb32(colors), colorSpace.Name));
             }
             
             await Bot.Client.AnswerInlineQueryAsync(q.InlineQuery.Id, result);
