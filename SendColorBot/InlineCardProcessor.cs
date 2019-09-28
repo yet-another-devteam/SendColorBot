@@ -46,7 +46,7 @@ namespace SendColorBot
             string hex = color.ToHex();
             // Removes alpha from HEX string if it is 255
             if (hex[hex.Length - 1] == 'F' || hex[hex.Length - 2] == 'F')
-                hex.Remove(hex.Length - 2);
+                hex = hex.Remove(hex.Length - 2);
 
             string rgb = $"{color.Rgb.R}, {color.Rgb.G}, {color.Rgb.B}";
             
