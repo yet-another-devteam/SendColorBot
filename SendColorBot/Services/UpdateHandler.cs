@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SendColorBot.ColorSpaces;
-using Telegram.Bot.Args;
 using SixLabors.ImageSharp.PixelFormats;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot.Services
@@ -15,7 +15,7 @@ namespace SendColorBot.Services
         private readonly InlineCardProcessor cardProcessor;
 
         // List of available color spaces
-        public static readonly List<ColorSpace> colorSpaces = new List<ColorSpace>()
+        private static readonly List<ColorSpace> colorSpaces = new List<ColorSpace>
         {
             new Cmyk(),
             new Rgb()
@@ -26,10 +26,10 @@ namespace SendColorBot.Services
             cardProcessor = new InlineCardProcessor();
         }
 
-        public async Task OnInlineQuery(InlineQueryEventArgs q)
+        public async Task OnInlineQuery(InlineQuery q)
         {
             // Stores the string requested by the user
-            string request = q.InlineQuery.Query;
+            string request = q.Query;
             
             if (string.IsNullOrEmpty(request))
                 return;
@@ -56,7 +56,7 @@ namespace SendColorBot.Services
                     result.Count == 0 ? 0 : + 2, colorSpace.ConvertToRgb32(colors), colorSpace.Name));
             }
             
-            await Bot.Client.AnswerInlineQueryAsync(q.InlineQuery.Id, result);
+            await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
         }
         
         private int[] GetColors(string requestString)

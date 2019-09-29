@@ -17,7 +17,7 @@ namespace SendColorBot
             LoggingService.StartLoggingService();
 
             UpdateHandler updates = new UpdateHandler();
-            Bot.Client.OnInlineQuery += async (sender, args) => { await updates.OnInlineQuery(args); };
+            Bot.Client.OnInlineQuery += async (sender, args) => { await updates.OnInlineQuery(args.InlineQuery); };
 
             // Starts update receiving
             Bot.Client.StartReceiving();
