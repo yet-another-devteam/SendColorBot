@@ -66,6 +66,7 @@ namespace SendColorBot.Services
             }
             
             await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
+            LoggingService.LogInfo("Send answer to " + q.From.Id);
         }
         
         private int[] GetColors(string requestString)
