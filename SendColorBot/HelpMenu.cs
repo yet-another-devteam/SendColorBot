@@ -17,7 +17,7 @@ namespace SendColorBot
             _client = client;
             _demoUrl = demoGifUrl;
 
-            _markup = new InlineKeyboardMarkup(new InlineKeyboardButton {Text = "Try it!", SwitchInlineQuery = "#FFF"});
+            _markup = new InlineKeyboardMarkup(new InlineKeyboardButton {Text = "Try it!", SwitchInlineQuery = "#30A3E6"});
         }
         
         public async Task HandleHelpRequest(long chatId)
