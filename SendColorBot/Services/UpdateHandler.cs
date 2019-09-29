@@ -26,6 +26,11 @@ namespace SendColorBot.Services
             cardProcessor = new InlineCardProcessor();
         }
 
+        public async Task OnMessage(Message message)
+        {
+                
+        }
+        
         public async Task OnInlineQuery(InlineQuery q)
         {
             // Stores the string requested by the user

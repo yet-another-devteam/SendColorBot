@@ -18,6 +18,7 @@ namespace SendColorBot
 
             UpdateHandler updates = new UpdateHandler();
             Bot.Client.OnInlineQuery += async (sender, args) => { await updates.OnInlineQuery(args.InlineQuery); };
+            Bot.Client.OnMessage += async (sender, args) => { await updates.OnMessage(args.Message); };
 
             // Starts update receiving
             Bot.Client.StartReceiving();
