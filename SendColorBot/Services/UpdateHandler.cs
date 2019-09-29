@@ -26,7 +26,7 @@ namespace SendColorBot.Services
         public UpdateHandler()
         {
             cardProcessor = new InlineCardProcessor();
-            _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["helpmenu:demogif"], Configuration.Root["helpmenu:text"]);
+            _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["helpmenu:demovideo"], Configuration.Root["helpmenu:text"]);
         }
 
         public async Task OnMessage(Message message)
