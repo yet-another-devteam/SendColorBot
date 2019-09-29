@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SendColorBot.ColorSpaces;
 using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot.Services
@@ -13,7 +14,8 @@ namespace SendColorBot.Services
     class UpdateHandler
     {
         private readonly InlineCardProcessor cardProcessor;
-
+        private readonly HelpMenu _helpMenu;
+        
         // List of available color spaces
         private static readonly List<ColorSpace> colorSpaces = new List<ColorSpace>
         {
@@ -24,11 +26,13 @@ namespace SendColorBot.Services
         public UpdateHandler()
         {
             cardProcessor = new InlineCardProcessor();
+            _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["helpmenu:demogif"], Configuration.Root["helpmenu:text"]);
         }
 
         public async Task OnMessage(Message message)
         {
-                
+            if (message.Chat.Type == ChatType.Private)
+                await _helpMenu.HandleHelpRequest(message.Chat.Id);
         }
         
         public async Task OnInlineQuery(InlineQuery q)

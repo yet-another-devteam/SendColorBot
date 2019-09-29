@@ -11,8 +11,9 @@ namespace SendColorBot
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json");
-            
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile("texts.json");
+
             Root = builder.Build();
         }
     }
