@@ -12,8 +12,11 @@ namespace SendColorBot.ColorSpaces
 
         public override Rgba32 ConvertToRgb32(int[] colors)
         {
-            return new Rgba32(new Vector4(
-                colors[0], colors[1], colors[2], colors[3]));
+            byte r = (byte)(255 * (1 - colors[0]) * (1 - colors[3]));
+            byte g = (byte)(255 * (1 - colors[1]) * (1 - colors[3]));
+            byte b = (byte)(255 * (1 - colors[2]) * (1 - colors[3]));
+            
+            return new Rgba32(r, g, b);
         }
     }
 }
