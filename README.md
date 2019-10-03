@@ -15,6 +15,10 @@ SendColorBot is a telegram bot that helps to send colors through the Inline inte
 
 [ImageSharp](https://github.com/SixLabors/ImageSharp) — Cross-platform library for image file processing.
 
+## ❗ Known issues
+
+• Currently bot can't work correctly on Telegram Desktop because of [some issues](https://github.com/telegramdesktop/tdesktop/issues/4580).
+
 ## ▶️ Build
 You need .NET Core SDK 2.2+. [Download it here](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
