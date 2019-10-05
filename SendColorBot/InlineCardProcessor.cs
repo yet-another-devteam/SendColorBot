@@ -34,6 +34,8 @@ namespace SendColorBot
             return new InlineQueryResultPhoto(id.ToString(), photoUrl, photoUrl)
             {
                 Caption = GenerateCaption(color, colorSpaceName),
+                PhotoWidth = 250,
+                PhotoHeight = 150
             };
         }
 

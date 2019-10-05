@@ -52,7 +52,7 @@ namespace SendColorBot.Services
             }
             catch
             {
-                Console.WriteLine($"Can't parse colors from string: [{request}]");
+                LoggingService.LogWarn($"Can't parse colors from string: [{request}]");
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace SendColorBot.Services
             }
             
             await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
-            LoggingService.LogInfo("Send answer to " + q.From.Id);
+            LoggingService.LogInfo("Send answer with " + result.Count + " results to " + q.From.Id);
         }
         
         private int[] GetColors(string requestString)
