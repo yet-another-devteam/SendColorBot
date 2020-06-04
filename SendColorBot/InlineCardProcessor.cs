@@ -11,7 +11,7 @@ namespace SendColorBot
                     
         public InlineCardProcessor()
         {
-            _imageGenerator = new ImageGenerator(Configuration.Root["imagegenerator:domain"]);    
+            _imageGenerator = new ImageGenerator(Configuration.Root["ImageGenerator:Domain"]);    
         }
         
         /// <param name="id">Card ID</param>

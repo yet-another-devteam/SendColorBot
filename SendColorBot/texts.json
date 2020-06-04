@@ -1,5 +1,5 @@
 {
-    "helpmenu": {
-        "text": "Simply type @SendColorBot in any chat and start entering the color code as in GIF. When the inline menu appears, select the color you want to send."
+    "en-us": {
+        "HelpMenu": "Simply type @SendColorBot in any chat and start entering the color code as in GIF. When the inline menu appears, select the color you want to send."
     }
 }

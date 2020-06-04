@@ -6,15 +6,18 @@ namespace SendColorBot
     class Configuration
     {
         public static IConfigurationRoot Root { get; private set; }
+        public static IConfigurationRoot Texts { get; private set; }
 
         public static void SetUp()
         {
-            var builder = new ConfigurationBuilder()
+            Root = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile("texts.json");
-
-            Root = builder.Build();
+                .Build();
+            Texts = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("texts.json")
+                .Build();
         }
     }
 }

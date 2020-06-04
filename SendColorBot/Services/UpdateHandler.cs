@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SendColorBot.ColorSpaces;
+using Serilog;
 using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -26,7 +27,7 @@ namespace SendColorBot.Services
         public UpdateHandler()
         {
             cardProcessor = new InlineCardProcessor();
-            _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["helpmenu:demovideo"], Configuration.Root["helpmenu:text"]);
+            _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["HelpMenu:DemoVideo"], Configuration.Texts["en-us:HelpMenu"]);
         }
 
         public async Task OnMessage(Message message)
@@ -52,7 +53,7 @@ namespace SendColorBot.Services
             }
             catch
             {
-                LoggingService.LogWarn($"Can't parse colors from string: [{request}]");
+                Log.Warning($"Can't parse colors from string: [{request}]");
                 return;
             }
 
@@ -66,7 +67,7 @@ namespace SendColorBot.Services
             }
             
             await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
-            LoggingService.LogInfo("Send answer with " + result.Count + " results to " + q.From.Id);
+            Log.Information("Send answer with " + result.Count + " results to " + q.From.Id);
         }
         
         private int[] GetColors(string requestString)

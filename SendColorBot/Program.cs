@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SendColorBot.Services;
+using Serilog;
 
 namespace SendColorBot
 {
@@ -13,8 +14,10 @@ namespace SendColorBot
             // Parse configuration.json
             Configuration.SetUp();
             // Creates new instance of bot client with token
-            Bot.Authorize(Configuration.Root["tokens:telegram"]);
-            LoggingService.StartLoggingService();
+            Bot.Authorize(Configuration.Root["Telegram:Token"]);
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration.Root)
+                .CreateLogger();
 
             UpdateHandler updates = new UpdateHandler();
             Bot.Client.OnInlineQuery += async (sender, args) => { await updates.OnInlineQuery(args.InlineQuery); };
@@ -22,7 +25,7 @@ namespace SendColorBot
 
             // Starts update receiving
             Bot.Client.StartReceiving();
-            LoggingService.LogInfo("Receiving messages...");
+            Log.Information("Receiving messages...");
 
             await Task.Delay(-1);
         }
