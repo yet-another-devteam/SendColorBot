@@ -98,7 +98,7 @@ namespace SendColorBot.Services
         
         private int[] GetColorsFromHex(string hexString)
         {
-            var rgba = Rgba32.FromHex(hexString);
+            Rgba32.TryParseHex(hexString, out Rgba32 rgba);
                 
             byte[] result = { rgba.R, rgba.G, rgba.B };
             // Translates byte array to int array and returns result
