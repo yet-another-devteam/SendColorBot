@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SendColorBot.Services;
 using Serilog;
+using Telegram.Bot.Types.Enums;
 
 namespace SendColorBot
 {
@@ -24,7 +25,7 @@ namespace SendColorBot
             Bot.Client.OnMessage += async (sender, args) => { await updates.OnMessage(args.Message); };
 
             // Starts update receiving
-            Bot.Client.StartReceiving();
+            Bot.Client.StartReceiving(new[] {UpdateType.Message, UpdateType.InlineQuery});
             Log.Information("Receiving messages...");
 
             await Task.Delay(-1);

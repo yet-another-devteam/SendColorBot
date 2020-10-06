@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SendColorBot.ColorSpaces;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types;
@@ -12,21 +13,17 @@ using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot.Services
 {
-    class UpdateHandler
-    {
-        private readonly InlineCardProcessor cardProcessor;
+    class UpdateHandler {
+        private readonly InlineCardProcessor _cardProcessor;
+        private readonly List<string> _colorSpaces;
+        private readonly ColorSpacesManager _colorSpacesManager;
         private readonly HelpMenu _helpMenu;
-        
-        // List of available color spaces
-        private static readonly List<ColorSpace> colorSpaces = new List<ColorSpace>
-        {
-            new Cmyk(),
-            new Rgb()
-        };
         
         public UpdateHandler()
         {
-            cardProcessor = new InlineCardProcessor();
+            _cardProcessor = new InlineCardProcessor();
+            _colorSpaces = Configuration.Root.GetSection("ColorSpaces").Get<List<string>>().Select(colorSpace => colorSpace.ToUpperInvariant()).ToList();
+            _colorSpacesManager = new ColorSpacesManager(_colorSpaces);
             _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["HelpMenu:DemoVideo"], Configuration.Texts["en-us:HelpMenu"]);
         }
 
@@ -45,11 +42,11 @@ namespace SendColorBot.Services
                 return;
 
             // An array that stores colors from the request
-            int[] colors;
+            float[] colors;
 
             try
             {
-                 colors = GetColors(request);
+                colors = GetColors(request.TrimStart('#'));
             }
             catch
             {
@@ -59,51 +56,43 @@ namespace SendColorBot.Services
 
             // Inline card list 
             List<InlineQueryResultBase> result = new List<InlineQueryResultBase>();
-            
-            foreach (var colorSpace in colorSpaces.Where(colorSpace => colorSpace.Verify(colors)))
-            {
-                result.AddRange(cardProcessor.ProcessInlineCardsForColorSpace(
-                    result.Count == 0 ? 0 : + 2, colorSpace.ConvertToRgb32(colors), colorSpace.Name));
+
+            byte index = 0;
+            foreach (var colorSpace in _colorSpaces) {
+                Rgba32 color;
+                try {
+                    color = _colorSpacesManager.CreateColorAndConvertToRgba32(colorSpace, colors);
+                } catch (ArgumentException) {
+                    continue;
+                }
+                
+                result.AddRange(_cardProcessor.ProcessInlineCardsForColorSpace(index++, color, colorSpace, colors));
             }
-            
-            await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
+
+            try {
+                await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
+            } catch {
+                // ignored
+            }
+
             Log.Information("Send answer with " + result.Count + " results to " + q.From.Id);
         }
         
-        private int[] GetColors(string requestString)
+        private float[] GetColors(string requestString)
         {
-            if (HexColorString(requestString))
+            if (Rgba32.TryParseHex(requestString, out var rgba))
             {
-                return GetColorsFromHex(requestString);
+                return new[] { rgba.R / 255.0f, rgba.G / 255.0f, rgba.B / 255.0f };
             }
             
+            var colorRegex = new Regex(@"-*(\d+)", RegexOptions.Compiled);
             // Selects all colors and creates an array of them
-            string[] colors = Regex.Matches(requestString, @"([0-9--]){1,}")
-                .Select(m => m.Value)
+
+            var colors = colorRegex.Matches(requestString)
+                .Select(m => int.Parse(m.Value, NumberStyles.Integer, CultureInfo.InvariantCulture) / 100.0f)
                 .ToArray();
-            
-            // Coverts string array to int array and returns
-            return Array.ConvertAll(colors, int.Parse);
-        }
 
-        private bool HexColorString(string hexString)
-        {
-            Regex regex = new Regex(@"[0-9A-Fa-f]{1,8}");
-            var matches = regex.Matches(hexString);
-            
-            string match = matches.Count == 1 ? matches[0].Value : null;
-
-            return match != null && hexString.Length - match.Length <= 1;
-        }
-        
-        private int[] GetColorsFromHex(string hexString)
-        {
-            Rgba32.TryParseHex(hexString, out Rgba32 rgba);
-                
-            byte[] result = { rgba.R, rgba.G, rgba.B };
-            // Translates byte array to int array and returns result
-            return result.Select(x => (int) x).ToArray();
-
+            return colors;
         }
     }
 }    
