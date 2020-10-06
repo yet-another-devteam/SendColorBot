@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace SendColorBot
 {
-    class Configuration
+    static class Configuration
     {
         public static IConfigurationRoot Root { get; private set; }
         public static IConfigurationRoot Texts { get; private set; }

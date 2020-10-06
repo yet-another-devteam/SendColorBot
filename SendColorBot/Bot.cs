@@ -2,7 +2,7 @@
 
 namespace SendColorBot
 {
-    class Bot
+    static class Bot
     {
         public static TelegramBotClient Client { get; private set; }
 
