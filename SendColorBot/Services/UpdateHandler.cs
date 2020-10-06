@@ -13,12 +13,13 @@ using Telegram.Bot.Types.InlineQueryResults;
 
 namespace SendColorBot.Services
 {
-    class UpdateHandler {
-        private readonly InlineCardProcessor _cardProcessor;
-        private readonly List<string> _colorSpaces;
-        private readonly ColorSpacesManager _colorSpacesManager;
-        private readonly HelpMenu _helpMenu;
-        
+    class UpdateHandler
+    {
+        readonly InlineCardProcessor _cardProcessor;
+        readonly List<string> _colorSpaces;
+        readonly ColorSpacesManager _colorSpacesManager;
+        readonly HelpMenu _helpMenu;
+
         public UpdateHandler()
         {
             _cardProcessor = new InlineCardProcessor();
@@ -27,17 +28,28 @@ namespace SendColorBot.Services
             _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["HelpMenu:DemoVideo"], Configuration.Texts["en-us:HelpMenu"]);
         }
 
-        public async Task OnMessage(Message message)
+        float[] GetColors(string requestString)
         {
-            if (message.Chat.Type == ChatType.Private)
-                await _helpMenu.HandleHelpRequest(message.Chat.Id);
+            if (Rgba32.TryParseHex(requestString, out Rgba32 rgba))
+            {
+                return new[] {rgba.R / 255.0f, rgba.G / 255.0f, rgba.B / 255.0f};
+            }
+
+            var colorRegex = new Regex(@"-*(\d+)", RegexOptions.Compiled);
+            // Selects all colors and creates an array of them
+
+            float[] colors = colorRegex.Matches(requestString)
+                .Select(m => int.Parse(m.Value, NumberStyles.Integer, CultureInfo.InvariantCulture) / 100.0f)
+                .ToArray();
+
+            return colors;
         }
-        
+
         public async Task OnInlineQuery(InlineQuery q)
         {
             // Stores the string requested by the user
             string request = q.Query;
-            
+
             if (string.IsNullOrEmpty(request))
                 return;
 
@@ -58,41 +70,39 @@ namespace SendColorBot.Services
             List<InlineQueryResultBase> result = new List<InlineQueryResultBase>();
 
             byte index = 0;
-            foreach (var colorSpace in _colorSpaces) {
+            foreach (string colorSpace in _colorSpaces)
+            {
                 Rgba32 color;
-                try {
+                try
+                {
                     color = _colorSpacesManager.CreateColorAndConvertToRgba32(colorSpace, colors);
-                } catch (ArgumentException) {
+                }
+                catch (ArgumentException)
+                {
                     continue;
                 }
-                
+
                 result.AddRange(_cardProcessor.ProcessInlineCardsForColorSpace(index++, color, colorSpace, colors));
             }
 
-            try {
+            try
+            {
                 await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
-            } catch {
+            }
+            catch
+            {
                 // ignored
             }
 
             Log.Information("Send answer with " + result.Count + " results to " + q.From.Id);
         }
-        
-        private float[] GetColors(string requestString)
+
+        public async Task OnMessage(Message message)
         {
-            if (Rgba32.TryParseHex(requestString, out var rgba))
+            if (message.Chat.Type == ChatType.Private)
             {
-                return new[] { rgba.R / 255.0f, rgba.G / 255.0f, rgba.B / 255.0f };
+                await _helpMenu.HandleHelpRequest(message.Chat.Id);
             }
-            
-            var colorRegex = new Regex(@"-*(\d+)", RegexOptions.Compiled);
-            // Selects all colors and creates an array of them
-
-            var colors = colorRegex.Matches(requestString)
-                .Select(m => int.Parse(m.Value, NumberStyles.Integer, CultureInfo.InvariantCulture) / 100.0f)
-                .ToArray();
-
-            return colors;
         }
     }
-}    
+}

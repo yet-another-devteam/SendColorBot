@@ -8,11 +8,43 @@ namespace SendColorBot
 {
     public class InlineCardProcessor
     {
-        private readonly IImageGenerator _imageGenerator;
-                    
+        readonly IImageGenerator _imageGenerator;
+
         public InlineCardProcessor()
         {
-            _imageGenerator = new ImageGenerator(Configuration.Root["ImageGenerator:Domain"]);    
+            _imageGenerator = new ImageGenerator(Configuration.Root["ImageGenerator:Domain"]);
+        }
+
+        /*
+        private InlineQueryResultArticle ProcessTitleInlineCard(int id, string title)
+        {
+            return new InlineQueryResultArticle(id.ToString(), $"{title}:", new InputTextMessageContent("You should choose color space that you want to use!"));
+        }
+        */
+
+        string GenerateCaption(Rgba32 color, string colorSpaceName, float[] colors)
+        {
+            string hex = color.ToHex();
+
+            // Removes alpha from HEX string
+            if (hex.Length > 6)
+                hex = hex[..6];
+
+            string rgb = $"{color.Rgb.R}, {color.Rgb.G}, {color.Rgb.B}";
+
+            var caption = new StringBuilder();
+            if (colorSpaceName != "RGB")
+            {
+                caption.Append(colorSpaceName);
+                caption.Append(": ");
+                caption.Append(string.Join(", ", colors.Select(x => (int) (x * 100))));
+                caption.Append('\n');
+            }
+
+            caption.Append($"HEX: #{hex}\n");
+            caption.Append($"RGB: {rgb}\n");
+
+            return caption.ToString();
         }
 
         /// <param name="id">Card ID</param>
@@ -30,9 +62,9 @@ namespace SendColorBot
             return result.ToArray();
         }
 
-        private InlineQueryResultPhoto ProcessPhotoInlineCard(int id, Rgba32 color, string colorSpaceName, float[] colors)
+        InlineQueryResultPhoto ProcessPhotoInlineCard(int id, Rgba32 color, string colorSpaceName, float[] colors)
         {
-            var photoUrl = _imageGenerator.GetLink(color);
+            string photoUrl = _imageGenerator.GetLink(color);
             return new InlineQueryResultPhoto(id.ToString(), photoUrl, photoUrl)
             {
                 Caption = GenerateCaption(color, colorSpaceName, colors),
@@ -40,36 +72,5 @@ namespace SendColorBot
                 PhotoHeight = 150
             };
         }
-
-        /*
-        private InlineQueryResultArticle ProcessTitleInlineCard(int id, string title)
-        {
-            return new InlineQueryResultArticle(id.ToString(), $"{title}:", new InputTextMessageContent("You should choose color space that you want to use!"));
-        }
-        */
-
-        private string GenerateCaption(Rgba32 color, string colorSpaceName, float[] colors)
-        {
-            string hex = color.ToHex();
-
-            // Removes alpha from HEX string
-            if (hex.Length > 6)
-                hex = hex[..^2];
-
-            string rgb = $"{color.Rgb.R}, {color.Rgb.G}, {color.Rgb.B}";
-
-            StringBuilder caption = new StringBuilder();
-            if (colorSpaceName != "RGB") {
-                caption.Append(colorSpaceName);
-                caption.Append(": ");
-                caption.Append(string.Join(", ", colors.Select(x => (int) (x * 100))));
-                caption.Append('\n');
-            }
-
-            caption.Append($"HEX: #{hex}\n");
-            caption.Append($"RGB: {rgb}\n");
-
-            return caption.ToString();
-        }
     }
-}   
+}

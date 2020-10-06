@@ -6,23 +6,27 @@ namespace SendColorBot
 {
     public class HelpMenu
     {
-        private readonly TelegramBotClient _client;
-        private readonly string _demoVideo;
-        private readonly string _helpText;
-        private readonly InlineKeyboardMarkup _markup;
-        
+        readonly TelegramBotClient _client;
+        readonly string _demoVideo;
+        readonly string _helpText;
+        readonly InlineKeyboardMarkup _markup;
+
         public HelpMenu(TelegramBotClient client, string demoVideoVideo, string helpText)
         {
             _helpText = helpText;
             _client = client;
             _demoVideo = demoVideoVideo;
 
-            _markup = new InlineKeyboardMarkup(new InlineKeyboardButton {Text = "Try it now!", SwitchInlineQuery = "#30A3E6"});
+            _markup = new InlineKeyboardMarkup(new InlineKeyboardButton
+            {
+                Text = "Try it now!",
+                SwitchInlineQuery = "#30A3E6"
+            });
         }
-        
+
         public async Task HandleHelpRequest(long chatId)
         {
-            await _client.SendVideoAsync(chatId, _demoVideo, caption:_helpText, replyMarkup: _markup);
+            await _client.SendVideoAsync(chatId, _demoVideo, caption: _helpText, replyMarkup: _markup);
         }
     }
 }

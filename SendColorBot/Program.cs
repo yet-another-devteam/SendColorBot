@@ -20,7 +20,7 @@ namespace SendColorBot
                 .ReadFrom.Configuration(Configuration.Root)
                 .CreateLogger();
 
-            UpdateHandler updates = new UpdateHandler();
+            var updates = new UpdateHandler();
             Bot.Client.OnInlineQuery += async (sender, args) => { await updates.OnInlineQuery(args.InlineQuery); };
             Bot.Client.OnMessage += async (sender, args) => { await updates.OnMessage(args.Message); };
 
