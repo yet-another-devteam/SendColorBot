@@ -16,19 +16,28 @@ namespace SendColorBot
         readonly Dictionary<string, MethodInfo> _colorConverters;
         readonly ColorSpaceConverter _colorSpaceConverter = new ColorSpaceConverter();
 
-        public ColorSpacesManager(List<string> colorSpaces)
+        public ColorSpacesManager(ICollection<string> colorSpaces)
         {
-            List<Type> _colorTypes = typeof(Color).Assembly.GetTypes().Where(type => (type.Namespace == "SixLabors.ImageSharp.ColorSpaces") && colorSpaces.Contains(type.Name.ToUpperInvariant())).ToList();
+            List<Type> _colorTypes = typeof(Color).Assembly.GetTypes()
+                .Where(type => (type.Namespace == "SixLabors.ImageSharp.ColorSpaces")
+                            && colorSpaces.Contains(type.Name.ToUpperInvariant())).ToList();
 
             _colorConstructors = _colorTypes
                 .Select(type => (type.Name.ToUpperInvariant(), type.GetConstructors()
-                    .FirstOrDefault(ctor => ctor.GetParameters().All(parameter => parameter.ParameterType == typeof(float)))))
-                .Where(kvp => kvp.Item2 != null).ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
+                    .FirstOrDefault(ctor => ctor.GetParameters()
+                        .All(parameter => parameter.ParameterType == typeof(float)))))
+                .Where(kvp => kvp.Item2 != null)
+                .ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
 
             _colorConverters = _colorTypes
                 .Select(type => (type.Name.ToUpperInvariant(), typeof(ColorSpaceConverter)
-                    .GetMethod("ToRgb", BindingFlags.Public | BindingFlags.Instance, null, new[] {type.MakeByRefType()}, null)))
-                .Where(kvp => kvp.Item2 != null).ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
+                    .GetMethod("ToRgb",
+                        BindingFlags.Public | BindingFlags.Instance,
+                        null, 
+                        new[] {type.MakeByRefType()},
+                        null)))
+                .Where(kvp => kvp.Item2 != null)
+                .ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
 
             var method = new DynamicMethod("ReturnRgb", typeof(Rgb), new[] {typeof(Rgb)});
             ILGenerator ilGenerator = method.GetILGenerator();
@@ -38,7 +47,10 @@ namespace SendColorBot
             _colorConverters["RGB"] = method;
         }
 
-        static Rgba32 ConvertRgbToRgba32(Rgb rgbSpace) => new Rgba32(rgbSpace.R, rgbSpace.G, rgbSpace.B);
+        static Rgba32 ConvertRgbToRgba32(Rgb rgbSpace)
+        {
+            return new Rgba32(rgbSpace.R, rgbSpace.G, rgbSpace.B);
+        }
 
         public Rgba32 CreateColorAndConvertToRgba32(string colorSpace, float[] colors)
         {
@@ -58,7 +70,8 @@ namespace SendColorBot
             }
 
             // ReSharper disable once PossibleNullReferenceException
-            var rgbSpace = (Rgb) colorConverter.Invoke(_colorSpaceConverter, new[] {constructorInfo.Invoke(colors.Cast<object>().ToArray())});
+            var rgbSpace = (Rgb) colorConverter
+                .Invoke(_colorSpaceConverter, new[] {constructorInfo.Invoke(colors.Cast<object>().ToArray())});
 
             return ConvertRgbToRgba32(rgbSpace);
         }
