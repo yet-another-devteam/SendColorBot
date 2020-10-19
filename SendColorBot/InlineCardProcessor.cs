@@ -11,22 +11,24 @@ namespace SendColorBot
         readonly IImageGeneratorClient _imageGeneratorClient;
         private readonly CaptionGenerator _captionGenerator;
 
-        public InlineCardProcessor()
+        public InlineCardProcessor(CaptionGenerator captionGenerator)
         {
+            _captionGenerator = captionGenerator;
             _imageGeneratorClient = new ImageGeneratorClient(Configuration.Root["ImageGenerator:Domain"]);
         }
-        
-        /// <param name="id">Card ID</param>
-        /// <param name="color">With this color ImageGenerator will generate picture</param>
-        /// <param name="colorSpace">Color space that used for this color</param>
-        /// <param name="caption">Caption for sent image</param>
-        /// <returns>Card with preview image, which should be replaced with FinalMessage after sending</returns>
-        public (InlineQueryResultPhoto, FinalMessage) ProcessInlineCardForColorSpace(string id, Rgba32 color, ColorSpace colorSpace, string caption)
-        {
-            string previewUrl = _imageGeneratorClient.GetLink(color, 250, 150, colorSpace.Name);
-            string finalUrl = _imageGeneratorClient.GetLink(color, 250, 150, null);
 
-            var card = new InlineQueryResultPhoto(id, previewUrl, previewUrl)
+        /// <param name="cardId">Card ID</param>
+        /// <param name="colors"></param>
+        /// <param name="colorInRgb">With this color ImageGenerator will generate picture</param>
+        /// <param name="colorSpace">Color space that used for this color</param>
+        /// <returns>Card with preview image, which should be replaced with FinalMessage after sending</returns>
+        public (InlineQueryResultPhoto, FinalMessage) ProcessInlineCardForColorSpace(string cardId, float[] colors, Rgba32 colorInRgb, ColorSpace colorSpace)
+        {
+            string previewUrl = _imageGeneratorClient.GetLink(colorInRgb, 250, 150, colorSpace.Name);
+            string finalUrl = _imageGeneratorClient.GetLink(colorInRgb, 250, 150, null);
+            string caption = _captionGenerator.GenerateCaption(colorSpace, colors);
+            
+            var card = new InlineQueryResultPhoto(cardId, previewUrl, previewUrl)
             {
                 Caption = caption,
                 PhotoWidth = 250,   

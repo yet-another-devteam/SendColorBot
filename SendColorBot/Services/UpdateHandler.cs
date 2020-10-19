@@ -31,7 +31,7 @@ namespace SendColorBot.Services
             var colorSpaceNames = _colorSpaces.Select(x => x.Name).ToList();
             
             _colorSpacesManager = new ColorSpacesManager(colorSpaceNames);
-            _cardProcessor = new InlineCardProcessor();
+            _cardProcessor = new InlineCardProcessor(new CaptionGenerator(_colorSpacesManager, _colorSpaces));
             _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["HelpMenu:DemoVideo"], Configuration.Texts["en-us:HelpMenu"]);
             _imageGenerator = new ImageGeneratorClient(Configuration.Root["ImageGenerator:Domain"]);
             _resultsStorage = new ResultsStorage();
@@ -75,10 +75,10 @@ namespace SendColorBot.Services
                 if (fromHex && colorSpace.Name != "RGB")
                     continue;
                 
-                Rgba32 color;
+                Rgba32 colorInRgb;
                 try
                 {
-                    color = _colorSpacesManager.CreateRgba32(colorSpace.Name, colorSpace.ConvertToImageSharpFormat(colors));
+                    colorInRgb = _colorSpacesManager.CreateRgba32(colorSpace.Name, colorSpace.ConvertToImageSharpFormat(colors));
                 }
                 catch (ArgumentException)
                 {
@@ -88,11 +88,11 @@ namespace SendColorBot.Services
                 float[] formattedColors = colorSpace.ConvertToImageSharpFormat(colors);
 
                 string id = Utilities.GetRandomHexNumber(8);
-                string caption = _captionGenerator.GenerateCaption(colorSpace, formattedColors);
 
-                InlineQueryResultPhoto card = _cardProcessor.ProcessInlineCardForColorSpace(id, color, colorSpace, caption);
+                var (card, finalMessage) = _cardProcessor.ProcessInlineCardForColorSpace(id, colors, colorInRgb, colorSpace);
+                
                 result.Add(card);
-                _resultsStorage[id] = new FinalMessage(_imageGenerator.GetLink(color, 250, 150, null), caption);
+                _resultsStorage[id] = finalMessage;
             }
 
             try
