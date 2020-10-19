@@ -85,14 +85,13 @@ namespace SendColorBot.Services
                     continue;
                 }
 
+                string resultId = Utilities.GetRandomHexNumber(8);
                 float[] formattedColors = colorSpace.ConvertToImageSharpFormat(colors);
 
-                string id = Utilities.GetRandomHexNumber(8);
-
-                var (card, finalMessage) = _cardProcessor.ProcessInlineCardForColorSpace(id, colors, colorInRgb, colorSpace);
+                var (card, finalMessage) = _cardProcessor.ProcessInlineCardForColorSpace(resultId, formattedColors, colorInRgb, colorSpace);
                 
                 result.Add(card);
-                _resultsStorage[id] = finalMessage;
+                _resultsStorage[resultId] = finalMessage;
             }
 
             try
