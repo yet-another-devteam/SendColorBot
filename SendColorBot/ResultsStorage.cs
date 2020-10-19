@@ -9,27 +9,28 @@ namespace SendColorBot
     /// </summary>
     public class ResultsStorage
     {
-        private MemoryCache memoryCache;
+        private readonly MemoryCache _memoryCache;
+        private readonly TimeSpan _inlineQueryLifetime = TimeSpan.FromMinutes(1);
+        
         public ResultsStorage()
         {
-            memoryCache = new MemoryCache(new MemoryCacheOptions());
+            _memoryCache = new MemoryCache(new MemoryCacheOptions());
         }
         
-        public FinalMessage this[string id] {
+        public FinalMessage this[string id]
+        {
             set
             {
-                memoryCache.Set(id, value, TimeSpan.FromMinutes(1));
+                _memoryCache.Set(id, value, _inlineQueryLifetime);
             }
         }
 
         public bool TryRemove(string id, out FinalMessage result)
         {
-            if (!memoryCache.TryGetValue(id, out result))
-            {
+            if (!_memoryCache.TryGetValue(id, out result))
                 return false;
-            }
 
-            memoryCache.Remove(id);
+            _memoryCache.Remove(id);
             return true;
         }
     }

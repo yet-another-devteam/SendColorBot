@@ -6,7 +6,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace SendColorBot
 {
-    class Program
+    static class Program
     {
         // Entry point
         static async Task Main()
@@ -21,11 +21,11 @@ namespace SendColorBot
                 .CreateLogger();
 
             var updates = new UpdateHandler();
-            Bot.Client.OnInlineQuery += async (sender, args) => { await updates.OnInlineQuery(args.InlineQuery); };
-            Bot.Client.OnMessage += async (sender, args) => { await updates.OnMessage(args.Message); };
-            Bot.Client.OnInlineResultChosen += async (sender, args) => { await updates.OnChosenResult(args.ChosenInlineResult); };
+            Bot.Client.OnInlineQuery += async (_, args) => { await updates.OnInlineQuery(args.InlineQuery); };
+            Bot.Client.OnMessage += async (_, args) => { await updates.OnMessage(args.Message); };
+            Bot.Client.OnInlineResultChosen += async (_, args) => { await updates.OnChosenResult(args.ChosenInlineResult); };
             
-            Bot.Client.OnCallbackQuery += async (sender, args) => { await Bot.Client.AnswerCallbackQueryAsync(args.CallbackQuery.Id, "Who asked you to click it?"); };
+            Bot.Client.OnCallbackQuery += async (_, args) => { await Bot.Client.AnswerCallbackQueryAsync(args.CallbackQuery.Id, "Who asked you to click it?"); };
 
             // Starts update receiving
             Bot.Client.StartReceiving(new[] {UpdateType.Message, UpdateType.InlineQuery, UpdateType.ChosenInlineResult, UpdateType.CallbackQuery});

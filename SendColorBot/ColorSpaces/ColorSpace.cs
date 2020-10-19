@@ -7,10 +7,10 @@ namespace SendColorBot.ColorSpaces
         public string Name { get; } // User friendly name of color space
         private readonly int colorsCount;    // How many primary colors color space use
         private readonly int[] maxColors;    // Max value for each color
-        public int[] MinColors;    // Min value for each color
-        public float[] ImageSharpRatio;
+        private int[] MinColors;    // Min value for each color
+        protected float[] ImageSharpRatio; 
 
-        public ColorSpace(string name, int colorsCount, int[] maxColors)
+        protected ColorSpace(string name, int colorsCount, int[] maxColors)
         {
             Name = name;
             this.colorsCount  = colorsCount;

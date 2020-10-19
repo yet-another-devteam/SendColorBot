@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
-using SendColorBot.Models;
+
 namespace SendColorBot.Services
 {
     class UpdateHandler
@@ -17,7 +17,6 @@ namespace SendColorBot.Services
         readonly List<ColorSpace> _colorSpaces;
         readonly ColorSpacesManager _colorSpacesManager;
         readonly HelpMenu _helpMenu;
-        private ImageGeneratorClient _imageGenerator;
         private ResultsStorage _resultsStorage;
 
         public UpdateHandler()
@@ -33,7 +32,6 @@ namespace SendColorBot.Services
             _colorSpacesManager = new ColorSpacesManager(colorSpaceNames);
             _cardProcessor = new InlineCardProcessor(new CaptionGenerator(_colorSpacesManager, _colorSpaces));
             _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["HelpMenu:DemoVideo"], Configuration.Texts["en-us:HelpMenu"]);
-            _imageGenerator = new ImageGeneratorClient(Configuration.Root["ImageGenerator:Domain"]);
             _resultsStorage = new ResultsStorage();
         }
 
@@ -68,7 +66,7 @@ namespace SendColorBot.Services
             }
 
             // Inline card list 
-            List<InlineQueryResultBase> result = new List<InlineQueryResultBase>();
+            var result = new List<InlineQueryResultBase>();
 
             foreach (ColorSpace colorSpace in _colorSpaces.Where(x => x.Verify(colors)))
             {
@@ -98,9 +96,9 @@ namespace SendColorBot.Services
             {
                 await Bot.Client.AnswerInlineQueryAsync(q.Id, result, 0, true);
             }
-            catch
+            catch(Exception e)
             {
-                // ignored
+                Log.Error("Got exception on answering inline query", e);
             }
 
             Log.Information("Send answer with " + result.Count + " results to " + q.From.Id);

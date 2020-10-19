@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SendColorBot.ColorSpaces;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace SendColorBot
 {
     public class CaptionGenerator
     {
-        readonly ColorSpacesManager _colorSpacesManager;
+        private readonly ColorSpacesManager _colorSpacesManager;
         private readonly List<ColorSpace> _colorSpaces;
         
         public CaptionGenerator(ColorSpacesManager colorSpacesManager, List<ColorSpace> colorSpaces)
@@ -19,7 +20,7 @@ namespace SendColorBot
         
         public string GenerateCaption(ColorSpace initColorSpace, float[] colors)
         {
-            var rgb = _colorSpacesManager.CreateRgba32(initColorSpace.Name, colors);
+            Rgba32 rgb = _colorSpacesManager.CreateRgba32(initColorSpace.Name, colors);
             var caption = new StringBuilder();
             string hex = rgb.ToHex();
 

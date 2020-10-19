@@ -5,7 +5,7 @@ namespace SendColorBot
 {
     public class ImageGeneratorClient : IImageGeneratorClient
     {
-        readonly string _domain;
+        private readonly string _domain;
 
         public ImageGeneratorClient(string imageGeneratorDomain)
         {

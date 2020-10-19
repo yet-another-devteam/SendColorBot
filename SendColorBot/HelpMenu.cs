@@ -6,10 +6,10 @@ namespace SendColorBot
 {
     public class HelpMenu
     {
-        readonly TelegramBotClient _client;
-        readonly string _demoVideo;
-        readonly string _helpText;
-        readonly InlineKeyboardMarkup _markup;
+        private readonly TelegramBotClient _client;
+        private readonly string _demoVideo;
+        private readonly string _helpText;
+        private readonly InlineKeyboardMarkup _markup;
 
         public HelpMenu(TelegramBotClient client, string demoVideoVideo, string helpText)
         {
