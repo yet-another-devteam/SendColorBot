@@ -1,76 +1,41 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SendColorBot.ColorSpaces;
+using SendColorBot.Models;
 using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types.InlineQueryResults;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SendColorBot
 {
     public class InlineCardProcessor
     {
-        readonly IImageGenerator _imageGenerator;
+        readonly IImageGeneratorClient _imageGeneratorClient;
+        private readonly CaptionGenerator _captionGenerator;
 
         public InlineCardProcessor()
         {
-            _imageGenerator = new ImageGenerator(Configuration.Root["ImageGenerator:Domain"]);
+            _imageGeneratorClient = new ImageGeneratorClient(Configuration.Root["ImageGenerator:Domain"]);
         }
-
-        /*
-        private InlineQueryResultArticle ProcessTitleInlineCard(int id, string title)
-        {
-            return new InlineQueryResultArticle(id.ToString(), $"{title}:", new InputTextMessageContent("You should choose color space that you want to use!"));
-        }
-        */
-
-        string GenerateCaption(Rgba32 color, string colorSpaceName, float[] colors)
-        {
-            string hex = color.ToHex();
-
-            // Removes alpha from HEX string
-            if (hex.Length > 6)
-                hex = hex[..6];
-
-            string rgb = $"{color.Rgb.R}, {color.Rgb.G}, {color.Rgb.B}";
-
-            var caption = new StringBuilder();
-            if (colorSpaceName != "RGB")
-            {
-                caption.Append(colorSpaceName);
-                caption.Append(": ");
-                caption.Append(string.Join(", ", colors.Select(x => (int) (x * 100))));
-                caption.Append('\n');
-            }
-
-            caption.Append($"HEX: #{hex}\n");
-            caption.Append($"RGB: {rgb}\n");
-
-            return caption.ToString();
-        }
-
+        
         /// <param name="id">Card ID</param>
         /// <param name="color">With this color ImageGenerator will generate picture</param>
-        /// <param name="colorSpaceName">Color space that used for this color</param>
-        /// <param name="colors">Source color values to display for color space</param>
-        public InlineQueryResultBase[] ProcessInlineCardsForColorSpace(int id, Rgba32 color, string colorSpaceName, float[] colors)
+        /// <param name="colorSpace">Color space that used for this color</param>
+        /// <param name="caption">Caption for sent image</param>
+        /// <returns>Card with preview image, which should be replaced with FinalMessage after sending</returns>
+        public (InlineQueryResultPhoto, FinalMessage) ProcessInlineCardForColorSpace(string id, Rgba32 color, ColorSpace colorSpace, string caption)
         {
-            List<InlineQueryResultBase> result = new List<InlineQueryResultBase>
-            {
-                //ProcessTitleInlineCard(id + 1, colorSpaceName),
-                ProcessPhotoInlineCard(id, color, colorSpaceName, colors)
-            };
+            string previewUrl = _imageGeneratorClient.GetLink(color, 250, 150, colorSpace.Name);
+            string finalUrl = _imageGeneratorClient.GetLink(color, 250, 150, null);
 
-            return result.ToArray();
-        }
-
-        InlineQueryResultPhoto ProcessPhotoInlineCard(int id, Rgba32 color, string colorSpaceName, float[] colors)
-        {
-            string photoUrl = _imageGenerator.GetLink(color);
-            return new InlineQueryResultPhoto(id.ToString(), photoUrl, photoUrl)
+            var card = new InlineQueryResultPhoto(id, previewUrl, previewUrl)
             {
-                Caption = GenerateCaption(color, colorSpaceName, colors),
-                PhotoWidth = 250,
-                PhotoHeight = 150
+                Caption = caption,
+                PhotoWidth = 250,   
+                PhotoHeight = 150,
+                ReplyMarkup = new InlineKeyboardMarkup(new InlineKeyboardButton {Text = "Loading...", CallbackData = "do-not-click-it"})
             };
+            
+            var finalMessage = new FinalMessage(finalUrl, caption);
+            return (card, finalMessage);
         }
     }
 }

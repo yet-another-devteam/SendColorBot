@@ -1,48 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using SendColorBot.ColorSpaces;
 using Serilog;
 using SixLabors.ImageSharp.PixelFormats;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
-
+using SendColorBot.Models;
 namespace SendColorBot.Services
 {
     class UpdateHandler
     {
         readonly InlineCardProcessor _cardProcessor;
-        readonly List<string> _colorSpaces;
+        readonly List<ColorSpace> _colorSpaces;
         readonly ColorSpacesManager _colorSpacesManager;
         readonly HelpMenu _helpMenu;
+        private ImageGeneratorClient _imageGenerator;
+        private ResultsStorage _resultsStorage;
 
         public UpdateHandler()
         {
-            _cardProcessor = new InlineCardProcessor();
-            _colorSpaces = Configuration.Root.GetSection("ColorSpaces").Get<List<string>>().Select(colorSpace => colorSpace.ToUpperInvariant()).ToList();
-            _colorSpacesManager = new ColorSpacesManager(_colorSpaces);
-            _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["HelpMenu:DemoVideo"], Configuration.Texts["en-us:HelpMenu"]);
-        }
-
-        float[] GetColors(string requestString)
-        {
-            if (Rgba32.TryParseHex(requestString, out Rgba32 rgba))
+            _colorSpaces = new List<ColorSpace>
             {
-                return new[] {rgba.R / 255.0f, rgba.G / 255.0f, rgba.B / 255.0f};
-            }
+                new Rgb(),
+                new Hsl()
+            };
 
-            var colorRegex = new Regex(@"-*(\d+)", RegexOptions.Compiled);
-            // Selects all colors and creates an array of them
-
-            float[] colors = colorRegex.Matches(requestString)
-                .Select(m => int.Parse(m.Value, NumberStyles.Integer, CultureInfo.InvariantCulture) / 100.0f)
-                .ToArray();
-
-            return colors;
+            var colorSpaceNames = _colorSpaces.Select(x => x.Name).ToList();
+            
+            _colorSpacesManager = new ColorSpacesManager(colorSpaceNames);
+            _cardProcessor = new InlineCardProcessor();
+            _helpMenu = new HelpMenu(Bot.Client, Configuration.Root["HelpMenu:DemoVideo"], Configuration.Texts["en-us:HelpMenu"]);
+            _imageGenerator = new ImageGeneratorClient(Configuration.Root["ImageGenerator:Domain"]);
+            _resultsStorage = new ResultsStorage();
         }
 
         public async Task OnInlineQuery(InlineQuery q)
@@ -55,10 +47,19 @@ namespace SendColorBot.Services
 
             // An array that stores colors from the request
             float[] colors;
-
+            bool fromHex = false;
+            
             try
             {
-                colors = GetColors(request.TrimStart('#'));
+                if (Rgba32.TryParseHex(request, out Rgba32 rgba))
+                {
+                    colors = new[] {(float)rgba.R, rgba.G, rgba.B};
+                    fromHex = true;
+                }
+                else
+                {
+                    colors = ColorUtils.GetColorsFromString(request);
+                }
             }
             catch
             {
@@ -69,25 +70,34 @@ namespace SendColorBot.Services
             // Inline card list 
             List<InlineQueryResultBase> result = new List<InlineQueryResultBase>();
 
-            byte index = 0;
-            foreach (string colorSpace in _colorSpaces)
+            foreach (ColorSpace colorSpace in _colorSpaces.Where(x => x.Verify(colors)))
             {
+                if (fromHex && colorSpace.Name != "RGB")
+                    continue;
+                
                 Rgba32 color;
                 try
                 {
-                    color = _colorSpacesManager.CreateColorAndConvertToRgba32(colorSpace, colors);
+                    color = _colorSpacesManager.CreateRgba32(colorSpace.Name, colorSpace.ConvertToImageSharpFormat(colors));
                 }
                 catch (ArgumentException)
                 {
                     continue;
                 }
 
-                result.AddRange(_cardProcessor.ProcessInlineCardsForColorSpace(index++, color, colorSpace, colors));
+                float[] formattedColors = colorSpace.ConvertToImageSharpFormat(colors);
+
+                string id = Utilities.GetRandomHexNumber(8);
+                string caption = _captionGenerator.GenerateCaption(colorSpace, formattedColors);
+
+                InlineQueryResultPhoto card = _cardProcessor.ProcessInlineCardForColorSpace(id, color, colorSpace, caption);
+                result.Add(card);
+                _resultsStorage[id] = new FinalMessage(_imageGenerator.GetLink(color, 250, 150, null), caption);
             }
 
             try
             {
-                await Bot.Client.AnswerInlineQueryAsync(q.Id, result);
+                await Bot.Client.AnswerInlineQueryAsync(q.Id, result, 0, true);
             }
             catch
             {
@@ -103,6 +113,21 @@ namespace SendColorBot.Services
             {
                 await _helpMenu.HandleHelpRequest(message.Chat.Id);
             }
+        }
+
+        public async Task OnChosenResult(ChosenInlineResult argsChosenInlineResult)
+        {
+            string resultId = argsChosenInlineResult.ResultId;
+            string messageId = argsChosenInlineResult.InlineMessageId;
+            Log.Information($"Chose result {resultId} with message {messageId}");
+
+            if (!_resultsStorage.TryRemove(resultId, out var finalMessage))
+                return;
+
+            var (image, caption) = finalMessage;
+            await Bot.Client.EditMessageMediaAsync(messageId, new InputMediaPhoto(new InputMedia(image)));
+            await Bot.Client.EditMessageCaptionAsync(messageId, caption);
+            Log.Information("Edited");
         }
     }
 }
