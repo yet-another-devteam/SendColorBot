@@ -9,7 +9,8 @@ namespace SendColorBot
     {
         public static float[] GetColorsFromString(string requestString)
         {
-            var colorRegex = new Regex(@"([\d(.,)]+)", RegexOptions.Compiled);
+            //var colorRegex = new Regex(@"([\d(.,)]+)", RegexOptions.Compiled);
+            var colorRegex = new Regex(@"-*(\d+)", RegexOptions.Compiled);
             // Selects all colors and creates an array of them
 
             var colors = colorRegex
