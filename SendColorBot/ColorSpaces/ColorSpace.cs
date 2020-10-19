@@ -5,7 +5,7 @@ namespace SendColorBot.ColorSpaces
     public abstract class ColorSpace
     {
         public string Name { get; } // User friendly name of color space
-        private readonly int colorsCount;    // How many primary colors color space use
+        protected readonly int colorsCount;    // How many primary colors color space use
         private readonly int[] maxColors;    // Max value for each color
         private int[] MinColors;    // Min value for each color
         protected float[] ImageSharpRatio; 
@@ -22,7 +22,7 @@ namespace SendColorBot.ColorSpaces
         /// <summary>
         /// Verifies that the color space can have the entered colors
         /// </summary>
-        public bool Verify(float[] colors)
+        public virtual bool Verify(float[] colors)
         {
             if (colors.Length != colorsCount)
                 return false;
@@ -42,7 +42,7 @@ namespace SendColorBot.ColorSpaces
             return result;
         }
         
-        public float[] ConvertToImageSharpFormat(float[] colors)
+        public virtual float[] ConvertToImageSharpFormat(float[] colors)
         {
             float[] result = colors.ToArray();
             for (int i = 0; i < colorsCount; i++)

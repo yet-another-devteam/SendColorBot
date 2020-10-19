@@ -73,10 +73,11 @@ namespace SendColorBot.Services
                 if (fromHex && colorSpace.Name != "RGB")
                     continue;
                 
+                float[] formattedColors = colorSpace.ConvertToImageSharpFormat(colors);
                 Rgba32 colorInRgb;
                 try
                 {
-                    colorInRgb = _colorSpacesManager.CreateRgba32(colorSpace.Name, colorSpace.ConvertToImageSharpFormat(colors));
+                    colorInRgb = _colorSpacesManager.CreateRgba32(colorSpace.Name, formattedColors);
                 }
                 catch (ArgumentException)
                 {
@@ -84,7 +85,6 @@ namespace SendColorBot.Services
                 }
 
                 string resultId = Utilities.GetRandomHexNumber(8);
-                float[] formattedColors = colorSpace.ConvertToImageSharpFormat(colors);
 
                 var (card, finalMessage) = _cardProcessor.ProcessInlineCardForColorSpace(resultId, formattedColors, colorInRgb, colorSpace);
                 

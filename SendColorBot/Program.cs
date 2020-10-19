@@ -26,8 +26,9 @@ namespace SendColorBot
             Bot.Client.OnInlineResultChosen += async (_, args) => { await updates.OnChosenResult(args.ChosenInlineResult); };
             
             Bot.Client.OnCallbackQuery += async (_, args) => { await Bot.Client.AnswerCallbackQueryAsync(args.CallbackQuery.Id, "Who asked you to click it?"); };
-
-            // Starts update receiving
+            Log.Information("Initialization complete");
+            
+            Log.Information("Starting to receive messages...");
             Bot.Client.StartReceiving(new[] {UpdateType.Message, UpdateType.InlineQuery, UpdateType.ChosenInlineResult, UpdateType.CallbackQuery});
             Log.Information("Receiving messages...");
 
