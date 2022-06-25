@@ -25,11 +25,16 @@ Log.Information("Starting to receive messages...");
 
 Bot.Client.StartReceiving(cancellationToken: CancellationToken.None,
     updateHandler: UpdateHandler,
-    errorHandler: (_, _, _) => Task.CompletedTask, 
+    errorHandler: (_, e, _) =>
+    {
+        Log.Error(e, "Error while receiving updates");
+        return Task.CompletedTask;
+    }, 
     receiverOptions: new ()
     {
-        AllowedUpdates = new[] {UpdateType.Message, UpdateType.CallbackQuery},
-        Offset = -1
+        AllowedUpdates = new[]
+            { UpdateType.Message, UpdateType.CallbackQuery, UpdateType.ChosenInlineResult, UpdateType.InlineQuery },
+        ThrowPendingUpdates = true
     });
 
 
@@ -50,10 +55,5 @@ async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationT
         case UpdateType.ChosenInlineResult:
             await updates.OnChosenResult(update.ChosenInlineResult);
             break;
-        case UpdateType.CallbackQuery:
-            await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Who asked you to click it?", cancellationToken: cancellationToken);
-            break;
-        
     }
-
 }
