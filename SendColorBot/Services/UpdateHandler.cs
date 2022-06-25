@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SendColorBot.ColorSpaces;
 using Serilog;
 using SixLabors.ImageSharp.PixelFormats;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
@@ -66,7 +67,7 @@ namespace SendColorBot.Services
             }
 
             // Inline card list 
-            var result = new List<InlineQueryResultBase>();
+            var result = new List<InlineQueryResult>();
 
             foreach (ColorSpace colorSpace in _colorSpaces.Where(x => x.Verify(colors)))
             {

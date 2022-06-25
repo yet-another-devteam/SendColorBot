@@ -33,7 +33,7 @@ namespace SendColorBot
                 Caption = caption,
                 PhotoWidth = 250,   
                 PhotoHeight = 150,
-                ReplyMarkup = new InlineKeyboardMarkup(new InlineKeyboardButton {Text = "Loading...", CallbackData = "do-not-click-it"})
+                ReplyMarkup = new InlineKeyboardMarkup(new InlineKeyboardButton("Loading...") {CallbackData = "do-not-click-it"})
             };
             
             var finalMessage = new FinalMessage(finalUrl, caption);

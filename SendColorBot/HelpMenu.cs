@@ -17,9 +17,8 @@ namespace SendColorBot
             _client = client;
             _demoVideo = demoVideoVideo;
 
-            _markup = new InlineKeyboardMarkup(new InlineKeyboardButton
+            _markup = new InlineKeyboardMarkup(new InlineKeyboardButton("Try it now!")
             {
-                Text = "Try it now!",
                 SwitchInlineQuery = "#30A3E6"
             });
         }
