@@ -23,7 +23,7 @@ Log.Information("Initialization complete");
 
 Log.Information("Starting to receive messages...");
 
-Bot.Client.StartReceiving(cancellationToken: CancellationToken.None,
+Bot.Client.StartReceiving(
     updateHandler: UpdateHandler,
     errorHandler: (_, e, _) =>
     {
